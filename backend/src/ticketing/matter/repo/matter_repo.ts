@@ -3,7 +3,7 @@ import { Matter, MatterListParams, FieldValue, UserValue, CurrencyValue, StatusV
 import logger from '../../../utils/logger.js';
 import { config } from '../../../utils/config.js';
 import { PoolClient } from 'pg';
-import { SORTABLE_COLUMNS, DEFAULT_SORT, isValidSortColumn } from '../constants/sortable-columns.js';
+import { SORTABLE_COLUMNS, DEFAULT_SORT, isValidSortColumn } from '../../../constants/sortable-columns.js';
 
 
 // Field ID cache for optimized sorting (avoids JOIN on ticketing_fields)
