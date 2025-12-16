@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useMatters } from './hooks/useMatters';
 import { MatterTable } from './components/MatterTable';
 import { Pagination } from './components/Pagination';
@@ -11,6 +11,21 @@ function App() {
   const [sortBy, setSortBy] = useState<string>(DEFAULT_SORT.column);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(DEFAULT_SORT.order);
   const [search, setSearch] = useState('');
+
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+
+  // Debounce search input (500ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      // Reset to page 1 when search changes
+      if (search !== debouncedSearch) {
+        setPage(1);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [search, debouncedSearch]);
   
 
   const { data, total, totalPages, loading, error } = useMatters({
@@ -18,7 +33,7 @@ function App() {
     limit,
     sortBy,
     sortOrder,
-    search,
+    search:debouncedSearch,
   });
 
   const handleSort = (column: string) => {
