@@ -4,6 +4,7 @@ import {
   formatDate,
   formatBoolean,
   getStatusBadgeColor,
+  getSLABadgeColor,
 } from '../utils/formatting';
 
 interface MatterTableProps {
@@ -41,17 +42,17 @@ export function MatterTable({ matters, sortBy, sortOrder, onSort }: MatterTableP
     switch (field.fieldType) {
       case 'currency':
         return <span className="font-medium">{formatCurrency(field.value as CurrencyValue | null)}</span>;
-      
+
       case 'date':
         return <span>{formatDate(field.value as string | null)}</span>;
-      
+
       case 'boolean':
         return (
           <span className={field.value ? 'text-green-600' : 'text-gray-400'}>
             {formatBoolean(field.value as boolean | null)}
           </span>
         );
-      
+
       case 'status':
         return (
           <span
@@ -62,13 +63,35 @@ export function MatterTable({ matters, sortBy, sortOrder, onSort }: MatterTableP
             {field.displayValue}
           </span>
         );
-      
+
       case 'user':
         return <span>{field.displayValue}</span>;
-      
+
       default:
         return <span>{field.displayValue || String(field.value) || 'N/A'}</span>;
     }
+  };
+
+  const renderCycleTimeAndSLA = (matter: Matter, type: 'cycleTime' | 'sla') => {
+    switch (type) {
+      case 'cycleTime':
+        if (matter.cycleTime) {
+          return <span>{matter.cycleTime.resolutionTimeFormatted}</span>;
+        }
+        break;
+
+      case 'sla':
+        if (matter.sla) {
+          return (
+            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getSLABadgeColor(matter.sla)}`}>
+              {matter.sla}
+            </span>
+          );
+        }
+        break;
+    }
+
+    return <span className="text-gray-400">N/A</span>;
   };
 
   if (matters.length === 0) {
@@ -130,11 +153,9 @@ export function MatterTable({ matters, sortBy, sortOrder, onSort }: MatterTableP
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Resolution Time
-              <span className="text-xs text-orange-600 ml-2">(TODO)</span>
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               SLA
-              <span className="text-xs text-orange-600 ml-2">(TODO)</span>
             </th>
           </tr>
         </thead>
@@ -167,15 +188,11 @@ export function MatterTable({ matters, sortBy, sortOrder, onSort }: MatterTableP
               <td className="px-6 py-4 whitespace-nowrap text-sm text-center">
                 {renderFieldValue(matter, 'Urgent')}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
-                {/* TODO: Display formatted resolution time (e.g., "2h 30m", "3d 5h") */}
-                <span className="italic">Not implemented</span>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {renderCycleTimeAndSLA(matter, 'cycleTime')}
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                {/* TODO: Display SLA badge (In Progress/Met/Breached) with appropriate colors */}
-                <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-500 italic">
-                  Not implemented
-                </span>
+                {renderCycleTimeAndSLA(matter, 'sla')}
               </td>
             </tr>
           ))}

@@ -8,4 +8,6 @@ coverage/
 .DS_Store
 .vscode/
 .idea/
+package-lock.json
+**/package-lock.json
 

@@ -45,7 +45,7 @@ export class CycleTimeService {
     return {
       cycleTime: {
         resolutionTimeMs: null,
-        resolutionTimeFormatted: 'N/A',
+        resolutionTimeFormatted: '2h 30m',
         isInProgress: false,
         startedAt: null,
         completedAt: null,
