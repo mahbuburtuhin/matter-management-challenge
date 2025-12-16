@@ -1,6 +1,7 @@
 import { MatterRepo } from '../repo/matter_repo.js';
 import { CycleTimeService } from './cycle_time_service.js';
 import { Matter, MatterListParams, MatterListResponse, StatusValue, CurrencyValue, UserValue } from '../../types.js';
+import logger from '../../../utils/logger.js';
 
 export class MatterService {
   private matterRepo: MatterRepo;
@@ -13,61 +14,46 @@ export class MatterService {
 
   async getMatters(params: MatterListParams): Promise<MatterListResponse> {
     const { page = 1, limit = 25 } = params;
-    const { matters, total } = await this.matterRepo.getMatters(params);
+    try {
+      const { matters, total } = await this.matterRepo.getMatters(params);
 
-    // Calculate cycle time and SLA for each matter
-    const enrichedMatters = await Promise.all(
-      matters.map(async (matter) => {
-        // Get current status group name
-        const statusField = matter.fields['Status'];
-        let statusGroupName: string | null = null;
-        
-        if (statusField && statusField.value && typeof statusField.value === 'object') {
-          statusGroupName = (statusField.value as StatusValue).groupName || null;
-        }
 
-        const { cycleTime, sla } = await this.cycleTimeService.calculateCycleTimeAndSLA(
-          matter.id,
-          statusGroupName,
-        );
 
-        return {
-          ...matter,
-          cycleTime,
-          sla,
-        };
-      }),
-    );
+      const matterIds = matters.map(matter => matter.id);
 
-    const totalPages = Math.ceil(total / limit);
+      const cycleTimeMap = await this.cycleTimeService.getCycleTimeAndSLABatch(
+        matterIds
+      );
 
-    return {
-      data: enrichedMatters,
-      total,
-      page,
-      limit,
-      totalPages,
-    };
+      const enrichedMatters = matters.map(matter => ({
+        ...matter,
+        ...cycleTimeMap.get(matter.id),
+      }));
+
+      const totalPages = Math.ceil(total / limit);
+
+      return {
+        data: enrichedMatters,
+        total,
+        page,
+        limit,
+        totalPages,
+      };
+    } catch (error) {
+      logger.error('Failed to fetch matters', { error, params });
+      throw error;
+    }
   }
 
   async getMatterById(matterId: string): Promise<Matter | null> {
     const matter = await this.matterRepo.getMatterById(matterId);
-    
+
     if (!matter) {
       return null;
     }
 
-    // Calculate cycle time and SLA
-    const statusField = matter.fields['Status'];
-    let statusGroupName: string | null = null;
-    
-    if (statusField && statusField.value && typeof statusField.value === 'object') {
-      statusGroupName = (statusField.value as StatusValue).groupName || null;
-    }
-
-    const { cycleTime, sla } = await this.cycleTimeService.calculateCycleTimeAndSLA(
+    const { cycleTime, sla } = await this.cycleTimeService.getCycleTimeAndSLA(
       matter.id,
-      statusGroupName,
     );
 
     return {

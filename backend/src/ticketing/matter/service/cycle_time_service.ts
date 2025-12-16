@@ -1,67 +1,141 @@
+import { CycleTimeRepo, CycleTimeHistoryEntry } from '../repo/cycle_time_repo.js';
 import { config } from '../../../utils/config.js';
+import { formatDuration } from '../../../utils/format.js';
 import { SLAStatus, CycleTime } from '../../types.js';
+import logger from '../../../utils/logger.js';
+
+export interface CycleTimeResult {
+  cycleTime: CycleTime;
+  sla: SLAStatus;
+}
+
+const DEFAULT_CYCLE_TIME_RESULT: CycleTimeResult = {
+  cycleTime: {
+    resolutionTimeMs: null,
+    resolutionTimeFormatted: 'N/A',
+    isInProgress: true,
+    startedAt: null,
+    completedAt: null,
+  },
+  sla: 'In Progress',
+};
 
 /**
  * CycleTimeService - Calculate resolution times and SLA status for matters
- * 
- * TODO: Implement this service to:
- * 1. Calculate resolution time from "To Do" → "Done" status transitions
- * 2. Determine SLA status based on resolution time vs threshold
- * 3. Format durations in human-readable format (e.g., "2h 30m", "3d 5h")
- * 
- * Requirements:
- * - Query ticketing_cycle_time_histories table
- * - Join with status groups to identify "To Do", "In Progress", "Done" statuses
- * - Calculate time between first transition and "Done" transition
- * - For in-progress matters, calculate time from first transition to now
- * - Compare against SLA_THRESHOLD_HOURS (default: 8 hours)
- * 
+ *
  * SLA Status Logic:
  * - "In Progress": Matter not yet in "Done" status
  * - "Met": Resolved within threshold (≤ 8 hours)
  * - "Breached": Resolved after threshold (> 8 hours)
- * 
- * Consider:
- * - Performance for 10,000+ matters
- * - Caching strategies for high load
- * - Database query optimization
  */
 export class CycleTimeService {
-  // SLA threshold in milliseconds (candidates will use this in their implementation)
-  private _slaThresholdMs: number;
+  private readonly _slaThresholdMs: number;
+  private readonly _cycleTimeRepo: CycleTimeRepo;
 
-  constructor() {
+  constructor(cycleTimeRepo?: CycleTimeRepo) {
     this._slaThresholdMs = config.SLA_THRESHOLD_HOURS * 60 * 60 * 1000;
+    this._cycleTimeRepo = cycleTimeRepo ?? new CycleTimeRepo();
   }
 
-  async calculateCycleTimeAndSLA(
-    _ticketId: string,
-    _currentStatusGroupName: string | null,
-  ): Promise<{ cycleTime: CycleTime; sla: SLAStatus }> {
-    // TODO: Implement cycle time calculation
-    // See requirements in class documentation above
-    
-    // Placeholder return - replace with actual implementation
+  /**
+   * Get cycle time and SLA for multiple matters in batch
+   * This is the preferred method for list views to avoid N+1 queries
+   */
+  async getCycleTimeAndSLABatch(matterIds: string[]): Promise<Map<string, CycleTimeResult>> {
+    if (matterIds.length === 0) {
+      logger.debug('getCycleTimeAndSLABatch called with empty matterIds');
+      return new Map();
+    }
+
+    logger.debug('Fetching cycle time for batch', { ticketCount: matterIds.length });
+
+    try {
+      const historyMap = await this._cycleTimeRepo.getCycleTimeHistoryBatch(matterIds);
+      const resultMap = new Map<string, CycleTimeResult>();
+
+      let breachedCount = 0;
+      let metCount = 0;
+      let inProgressCount = 0;
+
+      for (const ticketId of matterIds) {
+        const history = historyMap.get(ticketId) || [];
+        const result = this._calculateFromHistory(history);
+        resultMap.set(ticketId, result);
+
+        if (result.sla === 'Breached') breachedCount++;
+        else if (result.sla === 'Met') metCount++;
+        else inProgressCount++;
+      }
+
+      logger.info('Calculated cycle times for batch', {
+        ticketCount: matterIds.length,
+        breached: breachedCount,
+        met: metCount,
+        inProgress: inProgressCount,
+      });
+
+      return resultMap;
+    } catch (error) {
+      logger.error('Failed to fetch cycle time batch', { error, ticketCount: matterIds.length });
+      throw error;
+    }
+  }
+
+  /**
+   * Get cycle time and SLA for a single matter
+   */
+  async getCycleTimeAndSLA(ticketId: string): Promise<CycleTimeResult> {
+    logger.debug('Fetching cycle time for single ticket');
+    const resultMap = await this.getCycleTimeAndSLABatch([ticketId]);
+    const result = resultMap.get(ticketId) ?? DEFAULT_CYCLE_TIME_RESULT;
+
+    if (!resultMap.has(ticketId)) {
+      logger.warn('No cycle time history found for ticket, using default');
+    }
+
+    return result;
+  }
+
+  /**
+   * Core calculation logic - pure function that works with history data
+   */
+  private _calculateFromHistory(history: CycleTimeHistoryEntry[]): CycleTimeResult {
+    if (history.length === 0) {
+      return DEFAULT_CYCLE_TIME_RESULT;
+    }
+
+    const startedAt = history[0].transitionedAt;
+    const lastTransition = history[history.length - 1];
+    const isInProgress = lastTransition.toGroupName !== 'Done';
+
+    const completedAt = isInProgress ? null : lastTransition.transitionedAt;
+    const endTime = isInProgress ? new Date() : completedAt;
+    const resolutionTimeMs = endTime!.getTime() - startedAt.getTime();
+
+    const sla = this._determineSlaStatus(isInProgress, resolutionTimeMs);
+
     return {
       cycleTime: {
-        resolutionTimeMs: null,
-        resolutionTimeFormatted: '2h 30m',
-        isInProgress: false,
-        startedAt: null,
-        completedAt: null,
+        resolutionTimeMs,
+        resolutionTimeFormatted: formatDuration(resolutionTimeMs),
+        isInProgress,
+        startedAt,
+        completedAt,
       },
-      sla: 'In Progress',
+      sla,
     };
   }
 
-  // Helper method for formatting durations (candidates will implement this)
-  private _formatDuration(_durationMs: number, _isInProgress: boolean): string {
-    // TODO: Implement duration formatting
-    // Format as "2h 30m", "3d 5h", etc.
-    // Prefix with "In Progress: " if matter is not complete
-    return 'N/A';
+  /**
+   * Determine SLA status based on completion state and resolution time
+   */
+  private _determineSlaStatus(isInProgress: boolean, resolutionTimeMs: number): SLAStatus {
+    if (isInProgress) {
+      return 'In Progress';
+    }
+    return resolutionTimeMs <= this._slaThresholdMs ? 'Met' : 'Breached';
   }
+
 }
 
 export default CycleTimeService;
-
