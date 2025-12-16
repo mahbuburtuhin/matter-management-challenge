@@ -1,27 +1,5 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { CycleTimeRepo, CycleTimeHistoryEntry } from '../../repo/cycle_time_repo.js';
-
-// Mock config before importing CycleTimeService
-vi.mock('../../../utils/config.js', () => ({
-  config: {
-    DATABASE_URL: 'postgresql://test:test@localhost:5432/test',
-    PORT: 3000,
-    NODE_ENV: 'test' as const,
-    SLA_THRESHOLD_HOURS: 8,
-    LOG_LEVEL: 'error' as const,
-  },
-}));
-
-// Mock logger
-vi.mock('../../../utils/logger.js', () => ({
-  default: {
-    debug: vi.fn(),
-    info: vi.fn(),
-    warn: vi.fn(),
-    error: vi.fn(),
-  },
-}));
-
 import { CycleTimeService, CycleTimeResult } from '../cycle_time_service.js';
 
 interface MockCycleTimeRepo {
