@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
-import { CycleTimeRepo, CycleTimeHistoryEntry } from '../repo/cycle_time_repo.js';
+import { CycleTimeRepo, CycleTimeHistoryEntry } from '../../repo/cycle_time_repo.js';
 
 // Mock config before importing CycleTimeService
 vi.mock('../../../utils/config.js', () => ({
@@ -22,7 +22,7 @@ vi.mock('../../../utils/logger.js', () => ({
   },
 }));
 
-import { CycleTimeService, CycleTimeResult } from './cycle_time_service.js';
+import { CycleTimeService, CycleTimeResult } from '../cycle_time_service.js';
 
 interface MockCycleTimeRepo {
   getCycleTimeHistoryBatch: Mock;
