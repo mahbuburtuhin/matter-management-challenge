@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { useMatters } from './hooks/useMatters';
 import { MatterTable } from './components/MatterTable';
 import { Pagination } from './components/Pagination';
+import { DEFAULT_SORT } from './constants/sortable-columns';
 
 function App() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(25);
-  const [sortBy, setSortBy] = useState('created_at');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [sortBy, setSortBy] = useState<string>(DEFAULT_SORT.column);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(DEFAULT_SORT.order);
   const [search] = useState(''); // TODO: Implement search state management
 
   const { data, total, totalPages, loading, error } = useMatters({

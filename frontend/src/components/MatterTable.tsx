@@ -6,6 +6,7 @@ import {
   getStatusBadgeColor,
   getSLABadgeColor,
 } from '../utils/formatting';
+import { SORTABLE_COLUMNS } from '../constants/sortable-columns';
 
 interface MatterTableProps {
   matters: Matter[];
@@ -122,93 +123,93 @@ export function MatterTable({ matters, sortBy, sortOrder, onSort }: MatterTableP
         <thead className="bg-gray-50">
           <tr>
             <th
-              onClick={() => onSort('subject')}
+              onClick={() => onSort(SORTABLE_COLUMNS.SUBJECT)}
               className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
             >
               <div className="flex items-center gap-1">
                 Subject
-                {renderSortIcon('subject')}
+                {renderSortIcon(SORTABLE_COLUMNS.SUBJECT)}
               </div>
             </th>
             <th
-              onClick={() => onSort('Case Number')}
+              onClick={() => onSort(SORTABLE_COLUMNS.CASE_NUMBER)}
               className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
             >
               <div className="flex items-center gap-1">
                 Case Number
-                {renderSortIcon('Case Number')}
+                {renderSortIcon(SORTABLE_COLUMNS.CASE_NUMBER)}
               </div>
             </th>
             <th
-              onClick={() => onSort('Status')}
+              onClick={() => onSort(SORTABLE_COLUMNS.STATUS)}
               className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
             >
               <div className="flex items-center gap-1">
                 Status
-                {renderSortIcon('Status')}
+                {renderSortIcon(SORTABLE_COLUMNS.STATUS)}
               </div>
             </th>
             <th
-              onClick={() => onSort('Assigned To')}
+              onClick={() => onSort(SORTABLE_COLUMNS.ASSIGNED_TO)}
               className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
             >
               <div className="flex items-center gap-1">
                 Assigned To
-                {renderSortIcon('Assigned To')}
+                {renderSortIcon(SORTABLE_COLUMNS.ASSIGNED_TO)}
               </div>
             </th>
             <th
-              onClick={() => onSort('Priority')}
+              onClick={() => onSort(SORTABLE_COLUMNS.PRIORITY)}
               className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
             >
               <div className="flex items-center gap-1">
                 Priority
-                {renderSortIcon('Priority')}
+                {renderSortIcon(SORTABLE_COLUMNS.PRIORITY)}
               </div>
             </th>
             <th
-              onClick={() => onSort('Contract Value')}
+              onClick={() => onSort(SORTABLE_COLUMNS.CONTRACT_VALUE)}
               className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
             >
               <div className="flex items-center gap-1">
                 Contract Value
-                {renderSortIcon('Contract Value')}
+                {renderSortIcon(SORTABLE_COLUMNS.CONTRACT_VALUE)}
               </div>
             </th>
             <th
-              onClick={() => onSort('Due Date')}
+              onClick={() => onSort(SORTABLE_COLUMNS.DUE_DATE)}
               className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
             >
               <div className="flex items-center gap-1">
                 Due Date
-                {renderSortIcon('Due Date')}
+                {renderSortIcon(SORTABLE_COLUMNS.DUE_DATE)}
               </div>
             </th>
             <th
-              onClick={() => onSort('Urgent')}
+              onClick={() => onSort(SORTABLE_COLUMNS.URGENT)}
               className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
             >
               <div className="flex items-center gap-1">
                 Urgent
-                {renderSortIcon('Urgent')}
+                {renderSortIcon(SORTABLE_COLUMNS.URGENT)}
               </div>
             </th>
             <th
-              onClick={() => onSort('cycleTime')}
+              onClick={() => onSort(SORTABLE_COLUMNS.RESOLUTION_TIME)}
               className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
             >
               <div className="flex items-center gap-1">
                 Resolution Time
-                {renderSortIcon('cycleTime')}
+                {renderSortIcon(SORTABLE_COLUMNS.RESOLUTION_TIME)}
               </div>
             </th>
             <th
-              onClick={() => onSort('sla')}
+              onClick={() => onSort(SORTABLE_COLUMNS.SLA)}
               className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
             >
               <div className="flex items-center gap-1">
                 SLA
-                {renderSortIcon('sla')}
+                {renderSortIcon(SORTABLE_COLUMNS.SLA)}
               </div>
             </th>
           </tr>
