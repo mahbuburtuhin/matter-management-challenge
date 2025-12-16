@@ -42,6 +42,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      target: production
     container_name: matter-management-backend
     environment:
       DATABASE_URL: postgres://matter:matter@postgres:5432/matter_db

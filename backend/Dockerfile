@@ -1,7 +1,7 @@
 # Multi-stage build for production-grade backend
 
 # Build stage
-FROM node:18-alpine AS builder
+FROM node:18-alpine AS base
 
 WORKDIR /app
 
@@ -9,6 +9,8 @@ WORKDIR /app
 COPY package*.json ./
 COPY tsconfig.json ./
 
+
+FROM base AS development
 # Install dependencies
 RUN npm ci
 
@@ -19,7 +21,7 @@ COPY src ./src
 RUN npm run build
 
 # Production stage
-FROM node:18-alpine
+FROM base AS production
 
 WORKDIR /app
 
