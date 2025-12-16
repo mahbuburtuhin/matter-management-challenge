@@ -31,8 +31,8 @@ COPY package*.json ./
 # Install production dependencies only
 RUN npm ci --only=production
 
-# Copy built application from builder
-COPY --from=builder /app/dist ./dist
+# Copy built application from development
+COPY --from=development /app/dist ./dist
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && \
