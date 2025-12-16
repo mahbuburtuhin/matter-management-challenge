@@ -84,12 +84,12 @@ export class CycleTimeService {
   /**
    * Get cycle time and SLA for a single matter
    */
-  async getCycleTimeAndSLA(ticketId: string): Promise<CycleTimeResult> {
+  async getCycleTimeAndSLA(matterIds: string): Promise<CycleTimeResult> {
     logger.debug('Fetching cycle time for single ticket');
-    const resultMap = await this.getCycleTimeAndSLABatch([ticketId]);
-    const result = resultMap.get(ticketId) ?? DEFAULT_CYCLE_TIME_RESULT;
+    const resultMap = await this.getCycleTimeAndSLABatch([matterIds]);
+    const result = resultMap.get(matterIds) ?? DEFAULT_CYCLE_TIME_RESULT;
 
-    if (!resultMap.has(ticketId)) {
+    if (!resultMap.has(matterIds)) {
       logger.warn('No cycle time history found for ticket, using default');
     }
 
