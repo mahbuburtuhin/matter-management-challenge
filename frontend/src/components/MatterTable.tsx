@@ -130,32 +130,86 @@ export function MatterTable({ matters, sortBy, sortOrder, onSort }: MatterTableP
                 {renderSortIcon('subject')}
               </div>
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Case Number
+            <th
+              onClick={() => onSort('Case Number')}
+              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+            >
+              <div className="flex items-center gap-1">
+                Case Number
+                {renderSortIcon('Case Number')}
+              </div>
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Status
+            <th
+              onClick={() => onSort('Status')}
+              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+            >
+              <div className="flex items-center gap-1">
+                Status
+                {renderSortIcon('Status')}
+              </div>
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Assigned To
+            <th
+              onClick={() => onSort('Assigned To')}
+              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+            >
+              <div className="flex items-center gap-1">
+                Assigned To
+                {renderSortIcon('Assigned To')}
+              </div>
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Priority
+            <th
+              onClick={() => onSort('Priority')}
+              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+            >
+              <div className="flex items-center gap-1">
+                Priority
+                {renderSortIcon('Priority')}
+              </div>
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Contract Value
+            <th
+              onClick={() => onSort('Contract Value')}
+              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+            >
+              <div className="flex items-center gap-1">
+                Contract Value
+                {renderSortIcon('Contract Value')}
+              </div>
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Due Date
+            <th
+              onClick={() => onSort('Due Date')}
+              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+            >
+              <div className="flex items-center gap-1">
+                Due Date
+                {renderSortIcon('Due Date')}
+              </div>
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Urgent
+            <th
+              onClick={() => onSort('Urgent')}
+              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+            >
+              <div className="flex items-center gap-1">
+                Urgent
+                {renderSortIcon('Urgent')}
+              </div>
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Resolution Time
+            <th
+              onClick={() => onSort('cycleTime')}
+              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+            >
+              <div className="flex items-center gap-1">
+                Resolution Time
+                {renderSortIcon('cycleTime')}
+              </div>
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              SLA
+            <th
+              onClick={() => onSort('sla')}
+              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+            >
+              <div className="flex items-center gap-1">
+                SLA
+                {renderSortIcon('sla')}
+              </div>
             </th>
           </tr>
         </thead>
